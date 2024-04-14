@@ -98,6 +98,10 @@ A continuación, se presenta un ejemplo básico de cómo utilizar la API:
 
 Este es solo un ejemplo básico de uso de la API. Se pueden realizar otras operaciones y solicitudes según las necesidades del cliente.
 
+## Estructura de microservicios
+
+![image](https://github.com/Tianrojas/Lab08-AREP/assets/62759668/44fc316c-d69d-4dd7-bf7a-deb2fefd4a64)
+
 ## Compilación
 
 Para la compilación se debe ejecutar inicialmente la clase API por medio de `java -cp "target/classes:target/dependency/*" api.ApiGateway`.
