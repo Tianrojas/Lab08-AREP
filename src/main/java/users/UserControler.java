@@ -1,9 +1,13 @@
 package users;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.SecurityContext;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import posts.Post;
 import posts.PostService;
 import streams.Stream;
@@ -12,21 +16,26 @@ import streams.StreamService;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserControler {
+
+    @Inject
+    JsonWebToken jwt;
     @Inject
     PostService postService;
     @Inject
     UserService userService;
     @Inject
     StreamService streamService;
-    //curl -X POST -H "Content-Type: application/json" -d "{\"username\": \"ejemploUsuario\", \"email\": \"ejemplo@correo.com\", \"password\": \"contrasena123\"}" http://localhost:8080/users/user
+
     @POST
     @Path("/auth")
+    @RolesAllowed("Admin")
     @Consumes(MediaType.APPLICATION_JSON)
-    public User authUser(User user) {
+    public User authUser(@Context SecurityContext ctx, User user) {
         String email = user.email;
         String password = user.password;
         return userService.authUser(email, password);
@@ -34,8 +43,9 @@ public class UserControler {
 
     @POST
     @Path("/user")
+    @RolesAllowed({ "User", "Admin" })
     @Consumes(MediaType.APPLICATION_JSON)
-    public String createUser(User user) {
+    public String createUser(@Context SecurityContext ctx, User user) {
         String username = user.username;
         String email = user.email;
         String password = user.password;
@@ -45,8 +55,9 @@ public class UserControler {
 
     @POST
     @Path("/post")
+    @RolesAllowed({ "User", "Admin" })
     @Consumes(MediaType.APPLICATION_JSON)
-    public String createPost(Post post) {
+    public String createPost(@Context SecurityContext ctx, Post post) {
         String content = post.content;
         String authorId = post.authorID;
         String streamId = streamService.createStream(authorId);
@@ -55,8 +66,9 @@ public class UserControler {
 
     @POST
     @Path("/reply")
+    @RolesAllowed({ "User", "Admin" })
     @Consumes(MediaType.APPLICATION_JSON)
-    public String createReply(Post post) {
+    public String createReply(@Context SecurityContext ctx, Post post) {
         String content = post.content;
         String authorId = post.authorID;
         String streamId = post.streamID;
@@ -65,23 +77,28 @@ public class UserControler {
 
     @GET
     @Path("/posts")
+    @RolesAllowed({ "Admin" })
     public List<PostDTO> getPosts(@QueryParam("page") int page,
-                                  @QueryParam("pageSize") int pageSize) {
+                                  @QueryParam("pageSize") int pageSize,
+                                  @Context SecurityContext ctx) {
         List<Stream> streams = streamService.getAllStreams(page, pageSize);
-        return getPostDTOsFromStreams(streams);
+        return getPostDTOsFromStreams(streams, ctx);
     }
 
     @GET
     @Path("/postsByAuthor")
+    @RolesAllowed({ "User", "Admin" })
     public List<PostDTO> getPostsByAuthor(@QueryParam("authorID") String authorID,
                                           @QueryParam("page") int page,
-                                          @QueryParam("pageSize") int pageSize) {
+                                          @QueryParam("pageSize") int pageSize,
+                                          @Context SecurityContext ctx) {
         List<Stream> streams = streamService.getStreamsByAuthor(authorID, page, pageSize);
-        return getPostDTOsFromStreams(streams);
+        return getPostDTOsFromStreams(streams, ctx);
     }
 
-    private List<PostDTO> getPostDTOsFromStreams(List<Stream> streams) {
+    private List<PostDTO> getPostDTOsFromStreams(List<Stream> streams, SecurityContext ctx) {
         List<PostDTO> postDTOs = new ArrayList<>();
+        postDTOs.add(new PostDTO(null, getResponseString(ctx)));
         for (Stream stream : streams) {
             List<Post> posts = postService.getPostsByStream(stream.getId(), 0, Integer.MAX_VALUE);
             PostDTO postDTO = new PostDTO(stream.getId());
@@ -97,13 +114,25 @@ public class UserControler {
         return postDTOs;
     }
 
+    private String getResponseString(SecurityContext ctx) {
+        if (ctx.getUserPrincipal() == null) {
+            return "anonymous";
+        } else {
+            return ctx.getUserPrincipal().getName();
+        }
+    }
+
     static class PostDTO {
         private String streamId;
+        private String user;
         private List<Post> head = new ArrayList<>();
         private List<Post> tail = new ArrayList<>();
 
         public PostDTO(String streamId) {
             this.streamId = streamId;
+        }
+        public PostDTO(String streamId, String user) {
+            this.user = user;
         }
 
         public String getStreamId() {
