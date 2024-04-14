@@ -2,11 +2,11 @@
 
 ## Descripción
 
-Este proyecto corresponde al Taller 7 del curso de Desarrollo de Aplicaciones Web Seguras. Se trata de un prototipo de aplicación web que incluye funcionalidades de autenticación de usuarios, creación de publicaciones y gestión de flujos de contenido.
+Este proyecto corresponde al Taller 8. Se trata de un prototipo de aplicación web que incluye funcionalidades de autenticación de usuarios, creación de publicaciones y gestión de flujos de contenido.
 
 ## Arquitectura del Prototipo
 
-El prototipo está desarrollado utilizando el framework Quarkus para la creación de una API RESTful. Se emplea MongoDB como base de datos para almacenar la información de usuarios, publicaciones y flujos de contenido. Además, se utiliza JSON Web Tokens (JWT) para la autenticación de usuarios.
+El prototipo está desarrollado utilizando el framework Quarkus para la creación de una API RESTful dirigida a Microservicios. Se emplea MongoDB como base de datos para almacenar la información de usuarios, publicaciones y flujos de contenido. Además, se utiliza JSON Web Tokens (JWT) para la autenticación de usuarios.
 
 ## Estructura del Repositorio
 
@@ -97,3 +97,8 @@ A continuación, se presenta un ejemplo básico de cómo utilizar la API:
    ```
 
 Este es solo un ejemplo básico de uso de la API. Se pueden realizar otras operaciones y solicitudes según las necesidades del cliente.
+
+## Compilación
+
+Para la compilación se debe ejecutar inicialmente la clase API por medio de `java -cp "target/classes:target/dependency/*" api.ApiGateway`.
+Luego se procede a compilar los microservicios por medio de `quarkus dev`.
