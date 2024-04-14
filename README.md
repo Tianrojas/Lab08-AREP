@@ -8,6 +8,9 @@ Este proyecto corresponde al Taller 8. Se trata de un prototipo de aplicación w
 
 El prototipo está desarrollado utilizando el framework Quarkus para la creación de una API RESTful dirigida a Microservicios. Se emplea MongoDB como base de datos para almacenar la información de usuarios, publicaciones y flujos de contenido. Además, se utiliza JSON Web Tokens (JWT) para la autenticación de usuarios.
 
+![image](https://github.com/Tianrojas/Lab08-AREP/assets/62759668/4a88f5f2-d588-475e-b04c-a3e4ec6734d3)
+
+
 ## Estructura del Repositorio
 
 El repositorio está organizado de la siguiente manera:
